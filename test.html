@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+  <script src="https://unpkg.com/lodash"></script>
+  <script>
+    const eComments = [
+      { id: 'c1', user: 'J' },
+      { id: 'c2', user: 'R' },
+      { id: 'c3', user: 'E' }
+    ];
+
+    const eArticles = [
+      { id: 'a1', title: 'T1', comments: ['c1', 'c3'] },
+      { id: 'a2', title: 'T2', comments: ['c2'] }
+    ];
+
+    // to find comments
+    // eArticles[0].comments.map(id => eComments.find(comment => id === comment.id))
+
+    // to find article
+    // eArticles.find(eA => eA.comments.includes(eComments[2].id))
+
+
+
+  </script>
+</body>
+
+</html>

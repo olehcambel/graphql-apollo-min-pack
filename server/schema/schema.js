@@ -1,28 +1,37 @@
 const graphql = require('graphql');
 const _ = require('lodash');
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID } = graphql;
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLSchema,
+  GraphQLID,
+  GraphQLList
+} = graphql;
+
+const eComments = [{ id: 'c1' }, { id: 'c2' }, { id: 'c3' }];
+const eArticles = [
+  { id: 'a1', ecomments: ['c1', 'c3'] },
+  { id: 'a2', ecomments: ['c1', 'c2'] }
+];
 
 const comments = [
   {
     id: 'qwerqwer',
     user: 'Gilliam Underwood',
     text:
-      'Velit anim deserunt elit velit est fugiat duis eiusmod eu do incididunt ut tempor voluptate. Officia dolor aliqua id anim mollit pariatur id commodo. Laborum minim non ut aliquip commodo est consectetur. Mollit eu aliqua tempor est nulla ullamco irure. Sit non amet et eiusmod cillum ex cillum anim incididunt ad laboris mollit. Sunt quis incididunt elit ea qui non ullamco aliquip consequat voluptate eiusmod est. Irure laboris amet culpa sit aliquip.',
-    articleId: '56c782f18990ecf954f6e027'
+      'Velit anim deserunt elit velit est fugiat duis eiusmod eu do incididunt ut tempor voluptate. Officia dolor aliqua id anim mollit pariatur id commodo. Laborum minim non ut aliquip commodo est consectetur. Mollit eu aliqua tempor est nulla ullamco irure. Sit non amet et eiusmod cillum ex cillum anim incididunt ad laboris mollit. Sunt quis incididunt elit ea qui non ullamco aliquip consequat voluptate eiusmod est. Irure laboris amet culpa sit aliquip.'
   },
   {
     id: 'lkjhsdlfkg',
     user: 'Dolly Franklin',
     text:
-      'Aliquip id nostrud adipisicing irure. Labore reprehenderit ea ex officia ullamco incididunt consequat elit amet quis commodo. Fugiat amet veniam cillum ut aliquip velit est esse minim fugiat eiusmod sint. Commodo ea in culpa deserunt.',
-    articleId: '56c782f18990ecf954f6e027'
+      'Aliquip id nostrud adipisicing irure. Labore reprehenderit ea ex officia ullamco incididunt consequat elit amet quis commodo. Fugiat amet veniam cillum ut aliquip velit est esse minim fugiat eiusmod sint. Commodo ea in culpa deserunt.'
   },
   {
     id: 'zxcvzcxvzxcv',
     user: 'Brennan Atkins',
     text:
-      'Nisi sit nisi cillum dolor fugiat sint do nostrud ex cillum cupidatat. Culpa do duis non et excepteur labore dolor culpa qui tempor veniam. Ex labore deserunt qui sit aute ad incididunt do cupidatat eiusmod reprehenderit ad. Qui laborum qui voluptate velit et consectetur ipsum enim dolore minim. Est sint velit tempor reprehenderit. Qui consectetur ad minim consequat.',
-    articleId: '56c782f18990ecf954f6e027'
+      'Nisi sit nisi cillum dolor fugiat sint do nostrud ex cillum cupidatat. Culpa do duis non et excepteur labore dolor culpa qui tempor veniam. Ex labore deserunt qui sit aute ad incididunt do cupidatat eiusmod reprehenderit ad. Qui laborum qui voluptate velit et consectetur ipsum enim dolore minim. Est sint velit tempor reprehenderit. Qui consectetur ad minim consequat.'
   }
 ];
 
@@ -54,11 +63,14 @@ const CommentType = new GraphQLObjectType({
     article: {
       type: ArticleType,
       resolve(parent, args) {
-        return _.find(articles, { id: parent.articleId });
+        return articles.find(article => article.comments.includes(parent.id));
+        // return _.find(articles, { id: parent.articleId });
       }
     }
   })
 });
+// to find article
+// eArticles.find(eA => eA.comments.includes(eComments[2].id))
 
 const ArticleType = new GraphQLObjectType({
   name: 'Article',
@@ -66,10 +78,20 @@ const ArticleType = new GraphQLObjectType({
     id: { type: GraphQLID },
     date: { type: GraphQLString },
     title: { type: GraphQLString },
-    text: { type: GraphQLString }
-    // comments: { type: CommentType },
+    text: { type: GraphQLString },
+    comments: {
+      type: new GraphQLList(CommentType),
+      resolve(parent, args) {
+        // return _.filter(comments, { articleId: parent.id });
+        return parent.comments.map(id =>
+          comments.find(comment => id === comment.id)
+        );
+      }
+    }
   })
 });
+// to find comments
+// eArticles[0].comments.map(id => eComments.find(comment => id === comment.id))
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -86,7 +108,6 @@ const RootQuery = new GraphQLObjectType({
       type: ArticleType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
-        console.log(parent);
         return _.find(articles, { id: args.id });
       }
     }
