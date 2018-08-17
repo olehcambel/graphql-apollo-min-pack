@@ -106,6 +106,7 @@ const RootQuery = new GraphQLObjectType({
         return _.find(comments, { id: args.id });
       }
     },
+    
     articles: {
       type: new GraphQLList(ArticleType),
       resolve() {
@@ -122,10 +123,6 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
-// comment(id: "zxcvzcxvzxcv") {
-//   user
-//   text
-// }
 
 module.exports = new GraphQLSchema({
   query: RootQuery
