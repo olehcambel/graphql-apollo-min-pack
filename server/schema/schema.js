@@ -69,8 +69,6 @@ const CommentType = new GraphQLObjectType({
     }
   })
 });
-// to find article
-// eArticles.find(eA => eA.comments.includes(eComments[2].id))
 
 const ArticleType = new GraphQLObjectType({
   name: 'Article',
@@ -90,18 +88,28 @@ const ArticleType = new GraphQLObjectType({
     }
   })
 });
-// to find comments
-// eArticles[0].comments.map(id => eComments.find(comment => id === comment.id))
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
+    comments: {
+      type: new GraphQLList(CommentType),
+      // args:
+      resolve() {
+        return comments;
+      }
+    },
     comment: {
-      // kinda action, when someone is looking for /comment
       type: CommentType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
         return _.find(comments, { id: args.id });
+      }
+    },
+    articles: {
+      type: new GraphQLList(ArticleType),
+      resolve() {
+        return articles;
       }
     },
     article: {
