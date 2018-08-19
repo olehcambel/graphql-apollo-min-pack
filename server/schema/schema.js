@@ -7,8 +7,7 @@ const {
   GraphQLString,
   GraphQLSchema,
   GraphQLID,
-  GraphQLList,
-  GraphQLScalarType
+  GraphQLList
 } = graphql;
 
 const CommentType = new GraphQLObjectType({
@@ -75,6 +74,29 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addArticle: {
+      type: ArticleType,
+      args: {
+        date: { type: GraphQLString },
+        title: { type: GraphQLString },
+        text: { type: GraphQLString }
+      },
+      resolve(parent, args) {
+        let article = new Article({
+          date: args.date,
+          title: args.title,
+          text: args.text
+        });
+        return article.save();
+      }
+    }
+  }
+});
+
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation
 });
