@@ -1,49 +1,70 @@
 import React, { Component } from 'react';
-import { gql } from 'apollo-boost';
-import { graphql } from 'react-apollo';
-
-const getArticlesQuery = gql`
-  {
-    articles {
-      title
-      id
-    }
-  }
-`;
+import { graphql, compose } from 'react-apollo';
+import { getArticlesQuery, addCommentMutation } from '../queries';
 
 class AddComment extends Component {
+  state = {
+    user: '',
+    text: '',
+    articleId: ''
+  };
   render() {
     return (
-      <form>
+      <form onSubmit={this.submitForm}>
         <div className="field">
-          <label> Comment: </label>
-          <input />
+          <label> User name: </label>
+          <input name="user" onChange={this.handleChange} />
         </div>
         <div className="field">
-          <label> user </label>
-          <input />
+          <label> Text: </label>
+          <input name="text" onChange={this.handleChange} />
         </div>
         <div className="field">
           <label> Article: </label>
-          <select>
+          <select name="articleId" onChange={this.handleChange}>
             <option>Select Article Title</option>
             {this.showArticles()}
           </select>
         </div>
+        <button>+</button>
       </form>
     );
   }
 
+  handleChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
+
+  submitForm = e => {
+    e.preventDefault();
+
+    console.log(this.state);
+    this.props.addCommentMutation({
+      variables: {
+        user: this.state.user,
+        text: this.state.text,
+        articleId: this.state.articleId
+      }
+    });
+  };
+
   showArticles() {
-    const { data } = this.props;
+    const { getArticlesQuery: data } = this.props;
     if (data.loading) {
       return <option disabled>Loading articles ..</option>;
     } else {
       return data.articles.map(article => (
-        <option key={article.id}>{article.title}</option>
+        <option key={article.id} value={article.id}>
+          {article.title}
+        </option>
       ));
     }
   }
 }
 
-export default graphql(getArticlesQuery)(AddComment);
+export default compose(
+  graphql(getArticlesQuery, { name: 'getArticlesQuery' }),
+  graphql(addCommentMutation, { name: 'addCommentMutation' })
+)(AddComment);
