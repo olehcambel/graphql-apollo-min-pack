@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { graphql, compose } from 'react-apollo';
-import { getArticlesQuery, addCommentMutation } from '../queries';
+import {
+  getArticlesQuery,
+  addCommentMutation,
+  getCommentsQuery
+} from '../queries';
 
 class AddComment extends Component {
   state = {
@@ -40,13 +44,13 @@ class AddComment extends Component {
   submitForm = e => {
     e.preventDefault();
 
-    console.log(this.state);
     this.props.addCommentMutation({
       variables: {
         user: this.state.user,
         text: this.state.text,
         articleId: this.state.articleId
-      }
+      },
+      refetchQueries: [{ query: getCommentsQuery }]
     });
   };
 

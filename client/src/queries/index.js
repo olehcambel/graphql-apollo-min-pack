@@ -18,9 +18,38 @@ export const addCommentMutation = gql`
   }
 `;
 
+export const getCommentQuery = gql`
+  query($id: ID) {
+    comment(id: $id) {
+      id
+      user
+      text
+      article {
+        id
+        title
+        date
+        comments {
+          id
+          user
+          text
+        }
+      }
+    }
+  }
+`;
+
 export const getArticlesQuery = gql`
   {
     articles {
+      title
+      id
+    }
+  }
+`;
+
+export const getArticleMutation = gql`
+  mutation($date: String!, $title: String!, $text: String!) {
+    addArticle(date: $date, title: $title, text: $text) {
       title
       id
     }

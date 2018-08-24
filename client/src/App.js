@@ -3,6 +3,7 @@ import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import CommentList from './components/CommentList';
 import AddComment from './components/AddComment';
+import AddArticle from './components/AddArticle';
 
 // client setup for apollo
 const client = new ApolloClient({
@@ -15,6 +16,7 @@ class App extends Component {
       <ApolloProvider client={client}>
         <CommentList />
         <AddComment />
+        <AddArticle />
       </ApolloProvider>
     );
   }
