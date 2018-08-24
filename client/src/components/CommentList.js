@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
 import { getCommentsQuery } from '../queries';
 import CommentInfo from './CommentInfo';
+import RemoveComment from './RemoveComment';
+import { graphql } from 'react-apollo';
 
 class CommentList extends Component {
   state = {
@@ -31,6 +32,7 @@ class CommentList extends Component {
               onClick={this.handleClick.bind(this, comment.id)}
             >
               {comment.user}
+              <RemoveComment id={comment.id} />
             </li>
           ))}
         </ul>

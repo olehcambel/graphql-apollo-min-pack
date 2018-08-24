@@ -18,6 +18,14 @@ export const addCommentMutation = gql`
   }
 `;
 
+export const removeCommentMutation = gql`
+  mutation($id: ID!) {
+    removeComment(id: $id) {
+      id
+    }
+  }
+`;
+
 export const getCommentQuery = gql`
   query($id: ID) {
     comment(id: $id) {

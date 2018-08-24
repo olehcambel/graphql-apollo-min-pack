@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { getArticleMutation, getArticlesQuery } from '../queries';
 
-class AddArticle extends React.Component {
+class AddArticle extends Component {
   state = {
     date: '',
     title: '',

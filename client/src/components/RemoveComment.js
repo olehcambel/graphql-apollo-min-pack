@@ -1,0 +1,30 @@
+import React, { Component } from 'react';
+import { graphql } from 'react-apollo';
+import { removeCommentMutation, getCommentsQuery } from '../queries';
+
+class RemoveComment extends Component {
+  state = {};
+
+  render() {
+    return (
+      <div onClick={this.removeComment}>
+        <span role="img" aria-label="Remove">
+          ❌
+        </span>
+      </div>
+    );
+  }
+
+  removeComment = e => {
+    this.props.removeCommentMutation({
+      variables: {
+        id: this.props.id
+      },
+      refetchQueries: [{ query: getCommentsQuery }]
+    });
+  };
+}
+
+export default graphql(removeCommentMutation, {
+  name: 'removeCommentMutation'
+})(RemoveComment);
