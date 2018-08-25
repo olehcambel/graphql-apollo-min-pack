@@ -99,6 +99,13 @@ const Mutation = new GraphQLObjectType({
         return article.save();
       }
     },
+    removeArticle: {
+      type: ArticleType,
+      args: { id: { type: GraphQLID } },
+      resolve(parent, args) {
+        return Article.findByIdAndRemove(args.id);
+      }
+    },
     addComment: {
       type: CommentType,
       args: {

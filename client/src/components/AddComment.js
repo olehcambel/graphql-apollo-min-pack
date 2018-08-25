@@ -15,6 +15,7 @@ class AddComment extends Component {
   render() {
     return (
       <form onSubmit={this.submitForm}>
+        <h1>Add Comment</h1>
         <div className="field">
           <label> User name: </label>
           <input name="user" onChange={this.handleChange} />

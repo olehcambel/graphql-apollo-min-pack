@@ -12,6 +12,7 @@ class AddArticle extends Component {
   render() {
     return (
       <form onSubmit={this.submitForm}>
+        <h1>Add Article</h1>
         <div>
           <label> Date: </label>
           <input name="date" onChange={this.handleChange} />

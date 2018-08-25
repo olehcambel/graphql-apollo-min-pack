@@ -6,13 +6,7 @@ class RemoveComment extends Component {
   state = {};
 
   render() {
-    return (
-      <div onClick={this.removeComment}>
-        <span role="img" aria-label="Remove">
-          ❌
-        </span>
-      </div>
-    );
+    return <button onClick={this.removeComment}>delete</button>;
   }
 
   removeComment = e => {

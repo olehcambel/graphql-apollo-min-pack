@@ -31,7 +31,7 @@ class CommentList extends Component {
               key={comment.id}
               onClick={this.handleClick.bind(this, comment.id)}
             >
-              {comment.user}
+              {comment.id}
               <RemoveComment id={comment.id} />
             </li>
           ))}
@@ -40,7 +40,7 @@ class CommentList extends Component {
     }
   }
 
-  handleClick = (selected, e) => {
+  handleClick = selected => {
     this.setState({ selected });
   };
 }

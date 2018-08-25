@@ -1,6 +1,25 @@
 body {
   margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-  font-size: 16px;
+  height: 100vh;
+}
+* {
+  box-sizing: border-box;
+}
+
+.wrap {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  /* grid-template-rows: 200px 150px 50px; */
+  grid-template-areas: 'sidebar content';
+}
+
+.content {
+  grid-area: content;
+  height: 700px;
+  /* background-color: blue; */
+}
+.sidebar {
+  grid-area: sidebar;
+  /* height: 400px; */
+  /* background-color: red; */
 }
