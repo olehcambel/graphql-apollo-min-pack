@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { graphql } from 'react-apollo';
-import { editArticleMutation, getArticlesQuery } from '../queries';
+import { editArticleMutation } from '../queries';
 
 class EditArticle extends PureComponent {
   state = { isOpen: false };

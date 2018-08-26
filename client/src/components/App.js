@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import CommentList from './CommentList';
+// import CommentList from './CommentList';
+import Preview from './Preview';
 import Sidebar from './Sidebar';
 import Home from './Home';
 import {
@@ -21,7 +22,8 @@ class App extends Component {
           <div className="content">
             <Route exact path="/" component={Home} />
             <Route path="/form-creator" component={FormCreator} />
-            <Route path="/preview" component={CommentList} />
+            <Route path="/preview" component={Preview} />
+            {/* <Route path="/preview" component={CommentList} /> */}
           </div>
         </div>
       </Router>

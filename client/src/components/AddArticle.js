@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
-import { getArticleMutation, getArticlesQuery } from '../queries';
+import { addArticleMutation, getArticlesQuery } from '../queries';
 
 class AddArticle extends Component {
   state = {
@@ -35,7 +35,7 @@ class AddArticle extends Component {
   submitForm = e => {
     e.preventDefault();
 
-    this.props.getArticleMutation({
+    this.props.addArticleMutation({
       variables: {
         title: this.state.title,
         text: this.state.text
@@ -45,6 +45,6 @@ class AddArticle extends Component {
   };
 }
 
-export default graphql(getArticleMutation, { name: 'getArticleMutation' })(
+export default graphql(addArticleMutation, { name: 'addArticleMutation' })(
   AddArticle
 );

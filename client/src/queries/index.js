@@ -9,23 +9,6 @@ export const getCommentsQuery = gql`
   }
 `;
 
-export const addCommentMutation = gql`
-  mutation($user: String!, $text: String!, $articleId: String!) {
-    addComment(user: $user, text: $text, articleId: $articleId) {
-      user
-      id
-    }
-  }
-`;
-
-export const removeCommentMutation = gql`
-  mutation($id: ID!) {
-    removeComment(id: $id) {
-      id
-    }
-  }
-`;
-
 export const getCommentQuery = gql`
   query($id: ID) {
     comment(id: $id) {
@@ -42,6 +25,23 @@ export const getCommentQuery = gql`
           text
         }
       }
+    }
+  }
+`;
+
+export const addCommentMutation = gql`
+  mutation($user: String!, $text: String!, $articleId: String!) {
+    addComment(user: $user, text: $text, articleId: $articleId) {
+      user
+      id
+    }
+  }
+`;
+
+export const removeCommentMutation = gql`
+  mutation($id: ID!) {
+    removeComment(id: $id) {
+      id
     }
   }
 `;
@@ -70,16 +70,7 @@ export const getArticleQuery = gql`
   }
 `;
 
-// {
-//   article(id: "5b7cc27beeb6b1286844eb45") {
-//       id
-//       date
-//       title
-//       text
-//   }
-// }
-
-export const getArticleMutation = gql`
+export const addArticleMutation = gql`
   mutation($title: String!, $text: String!) {
     addArticle(title: $title, text: $text) {
       title
@@ -100,6 +91,22 @@ export const editArticleMutation = gql`
   mutation($id: ID!, $text: String!) {
     editArticle(id: $id, text: $text) {
       id
+    }
+  }
+`;
+
+export const getPreviewQuery = gql`
+  {
+    articles {
+      id
+      title
+      text
+      date
+      comments {
+        id
+        user
+        text
+      }
     }
   }
 `;

@@ -9,9 +9,14 @@ class ArticleInfo extends Component {
       debugger;
       return (
         <div>
-          <h3>{article.title}</h3>
-          <p>{article.text}</p>
-          <p>Date: {article.date}</p>
+          <h3>Title: {article.title}</h3>
+          <p>
+            <b>Text: </b>
+            {article.text}
+          </p>
+          <p>
+            <b>Date: </b> {article.date}
+          </p>
           <p>Other articles</p>
           <ul>
             {articles.map(article => (

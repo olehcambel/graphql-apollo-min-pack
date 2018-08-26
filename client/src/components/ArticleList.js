@@ -15,7 +15,7 @@ class ArticleList extends Component {
       <div>
         <h1>Available Article List</h1>
         {this.showArticles()}
-
+        <hr />
         <ArticleInfo articleId={this.state.selected} />
       </div>
     );
