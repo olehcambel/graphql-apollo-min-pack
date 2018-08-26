@@ -4,7 +4,6 @@ import { getArticleMutation, getArticlesQuery } from '../queries';
 
 class AddArticle extends Component {
   state = {
-    date: '',
     title: '',
     text: ''
   };
@@ -13,10 +12,7 @@ class AddArticle extends Component {
     return (
       <form onSubmit={this.submitForm}>
         <h1>Add Article</h1>
-        <div>
-          <label> Date: </label>
-          <input name="date" onChange={this.handleChange} />
-        </div>
+
         <div>
           <label> Title: </label>
           <input name="title" onChange={this.handleChange} />
@@ -41,7 +37,6 @@ class AddArticle extends Component {
 
     this.props.getArticleMutation({
       variables: {
-        date: this.state.date,
         title: this.state.title,
         text: this.state.text
       },

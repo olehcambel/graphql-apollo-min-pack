@@ -80,8 +80,8 @@ export const getArticleQuery = gql`
 // }
 
 export const getArticleMutation = gql`
-  mutation($date: String!, $title: String!, $text: String!) {
-    addArticle(date: $date, title: $title, text: $text) {
+  mutation($title: String!, $text: String!) {
+    addArticle(title: $title, text: $text) {
       title
       id
     }
@@ -91,6 +91,14 @@ export const getArticleMutation = gql`
 export const removeArticleMutation = gql`
   mutation($id: ID!) {
     removeArticle(id: $id) {
+      id
+    }
+  }
+`;
+
+export const editArticleMutation = gql`
+  mutation($id: ID!, $text: String!) {
+    editArticle(id: $id, text: $text) {
       id
     }
   }

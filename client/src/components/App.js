@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import CommentList from './CommentList';
-import AddComment from './AddComment';
-import AddArticle from './AddArticle';
 import Sidebar from './Sidebar';
 import Home from './Home';
 import {
   BrowserRouter as Router,
-  Route,
+  Route
   // Switch,
-  Link
+  // Link
 } from 'react-router-dom';
 import FormCreator from './FormCreator';
 

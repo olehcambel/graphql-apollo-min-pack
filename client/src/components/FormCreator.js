@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import AddComment from './AddComment';
 import AddArticle from './AddArticle';
 import CommentList from './CommentList';
 import ArticleList from './ArticleList';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 
 const FormCreator = ({ match }) => (
   <div>

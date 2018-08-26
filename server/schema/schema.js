@@ -86,13 +86,13 @@ const Mutation = new GraphQLObjectType({
     addArticle: {
       type: ArticleType,
       args: {
-        date: { type: new GraphQLNonNull(GraphQLString) },
+        // date: { type: new GraphQLNonNull(GraphQLString) },
         title: { type: new GraphQLNonNull(GraphQLString) },
         text: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve(parent, args) {
         let article = new Article({
-          date: args.date,
+          date: new Date(),
           title: args.title,
           text: args.text
         });
@@ -106,6 +106,20 @@ const Mutation = new GraphQLObjectType({
         return Article.findByIdAndRemove(args.id);
       }
     },
+    editArticle: {
+      type: ArticleType,
+      args: { id: { type: GraphQLID }, text: { type: GraphQLString } },
+      resolve(parent, args) {
+        // return Article.findByIdAndUpdate((args.id, { text: args.text }));
+        return Article.findById(args.id, (err, doc) => {
+          if (err) return;
+          doc.text = args.text;
+          doc.date = new Date();
+          doc.save();
+        });
+      }
+    },
+
     addComment: {
       type: CommentType,
       args: {

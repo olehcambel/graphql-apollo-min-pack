@@ -21,7 +21,7 @@ class ArticleInfo extends Component {
         </div>
       );
     } else {
-      return <div>Empty. write something </div>;
+      return <div>Empty ArticleInfo ... </div>;
     }
   }
 }

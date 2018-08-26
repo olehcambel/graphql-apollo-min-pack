@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { getArticlesQuery } from '../queries';
 import ArticleInfo from './ArticleInfo';
 import RemoveArticle from './RemoveArticle';
+import EditArticle from './EditArticle';
 import { graphql } from 'react-apollo';
 
 class ArticleList extends Component {
@@ -14,11 +15,11 @@ class ArticleList extends Component {
       <div>
         <h1>Available Article List</h1>
         {this.showArticles()}
+
         <ArticleInfo articleId={this.state.selected} />
       </div>
     );
   }
-
   showArticles() {
     const { data } = this.props;
     if (data.loading) {
@@ -30,6 +31,7 @@ class ArticleList extends Component {
             <li key={article.id} onClick={() => this.handleClick(article.id)}>
               {article.title}
               <RemoveArticle id={article.id} />
+              <EditArticle id={article.id} />
             </li>
           ))}
         </ul>

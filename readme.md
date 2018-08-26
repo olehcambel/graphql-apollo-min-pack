@@ -1,4 +1,4 @@
-#TODO: findByIdAndUpdate filter for both article and comment
+#TODO: code refactoring
 
 concurrently: `npm run start`
 
