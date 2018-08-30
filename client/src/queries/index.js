@@ -22,7 +22,6 @@ export const getCommentQuery = gql`
         comments {
           id
           user
-          text
         }
       }
     }

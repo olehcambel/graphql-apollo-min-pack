@@ -1,29 +1,23 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { graphql } from 'react-apollo';
 import { getArticleQuery } from '../queries';
+import Article from './Article';
 
 class ArticleInfo extends Component {
   render() {
     const { article, articles } = this.props.data;
     if (article) {
-      debugger;
       return (
-        <div>
-          <h3>Title: {article.title}</h3>
-          <p>
-            <b>Text: </b>
-            {article.text}
-          </p>
-          <p>
-            <b>Date: </b> {article.date}
-          </p>
+        <Fragment>
+          <Article article={article} full />
+
           <p>Other articles</p>
           <ul>
             {articles.map(article => (
-              <li key={article.id}>{article.title}</li>
+              <Article key={article.id} article={article} />
             ))}
           </ul>
-        </div>
+        </Fragment>
       );
     } else {
       return <div>Empty ArticleInfo ... </div>;

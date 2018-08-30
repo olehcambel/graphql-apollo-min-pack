@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { getArticlesQuery } from '../queries';
 import ArticleInfo from './ArticleInfo';
-import RemoveArticle from './RemoveArticle';
-import EditArticle from './EditArticle';
 import { graphql } from 'react-apollo';
+import Article from './Article';
 
-class ArticleList extends Component {
+class ArticleList extends PureComponent {
   state = {
     selected: null
   };
@@ -28,11 +27,12 @@ class ArticleList extends Component {
       return (
         <ul>
           {data.articles.map(article => (
-            <li key={article.id} onClick={() => this.handleClick(article.id)}>
-              {article.title}
-              <RemoveArticle id={article.id} />
-              <EditArticle id={article.id} />
-            </li>
+            <Article
+              key={article.id}
+              onClick={this.handleClick}
+              article={article}
+              edit
+            />
           ))}
         </ul>
       );

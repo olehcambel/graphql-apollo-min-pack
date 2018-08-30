@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { getCommentsQuery } from '../queries';
 import CommentInfo from './CommentInfo';
-import RemoveComment from './RemoveComment';
+import Comment from './Comment';
 import { graphql } from 'react-apollo';
 
 class CommentList extends Component {
@@ -27,13 +27,12 @@ class CommentList extends Component {
       return (
         <ul>
           {data.comments.map(comment => (
-            <li
+            <Comment
               key={comment.id}
-              onClick={this.handleClick.bind(this, comment.id)}
-            >
-              {comment.id}
-              <RemoveComment id={comment.id} />
-            </li>
+              comment={comment}
+              onClick={this.handleClick}
+              edit
+            />
           ))}
         </ul>
       );

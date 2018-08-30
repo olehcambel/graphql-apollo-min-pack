@@ -1,37 +1,28 @@
-import React, { Component } from 'react';
+import React, { Fragment } from 'react';
 import { getPreviewQuery } from '../queries';
 import { graphql } from 'react-apollo';
+import Article from './Article';
+import Comment from './Comment';
 
-class CommentList extends Component {
-  state = {};
-
-  render() {
-    const { articles, loading } = this.props.data;
-    if (loading) {
-      return <h2>Please wait. Loading Preview Mode ... </h2>;
-    }
-    return (
-      <div>
-        {articles.map(article => {
-          const { title, text, date, comments, id } = article;
-          return (
-            <div key={id}>
-              <h2>{title}</h2>
-              <h5>{text}</h5>
-              <h4>Date: {date}</h4>
-              <h2>Comments</h2>
-              {comments.map(comment => (
-                <div key={comment.id}>
-                  {comment.text} by {comment.user}
-                </div>
-              ))}
-              <hr />
-            </div>
-          );
-        })}
-      </div>
-    );
+const Preview = ({ data: { articles, loading } }) => {
+  if (loading) {
+    return <h2>Please wait. Loading Preview Mode ... </h2>;
   }
-}
+  return (
+    <Fragment>
+      {articles.map(article => (
+        <div key={article.id}>
+          <Article article={article} full />
 
-export default graphql(getPreviewQuery)(CommentList);
+          <h2>Comments</h2>
+          {article.comments.map(comment => (
+            <Comment key={comment.id} comment={comment} />
+          ))}
+          <hr />
+        </div>
+      ))}
+    </Fragment>
+  );
+};
+
+export default graphql(getPreviewQuery)(Preview);

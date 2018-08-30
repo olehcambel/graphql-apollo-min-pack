@@ -8,7 +8,8 @@ const {
   GraphQLSchema,
   GraphQLID,
   GraphQLList,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLInt
 } = graphql;
 
 const CommentType = new GraphQLObjectType({
@@ -48,9 +49,11 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     comments: {
       type: new GraphQLList(CommentType),
-      resolve() {
-        // return comments;
-        return Comment.find({});
+      args: { offset: { type: GraphQLInt }, first: { type: GraphQLInt } },
+      resolve(parent, args) {
+        return Comment.find({})
+          .skip(args.offset)
+          .limit(args.first);
       }
     },
     comment: {
@@ -64,9 +67,12 @@ const RootQuery = new GraphQLObjectType({
 
     articles: {
       type: new GraphQLList(ArticleType),
-      resolve() {
-        // return articles;
-        return Article.find({});
+      args: { offset: { type: GraphQLInt }, first: { type: GraphQLInt } },
+
+      resolve(parent, args) {
+        return Article.find({})
+          .skip(args.offset)
+          .limit(args.first);
       }
     },
     article: {

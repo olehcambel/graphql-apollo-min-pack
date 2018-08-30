@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
 import { getCommentQuery } from '../queries';
+import Comment from './Comment';
+import Article from './Article';
 
 class CommentInfo extends Component {
   render() {
@@ -8,21 +10,30 @@ class CommentInfo extends Component {
     if (comment) {
       return (
         <div>
-          <h3>{comment.user}</h3>
-          <p>
-            {comment.text}
-            <b> by {comment.user}</b>{' '}
-          </p>
-          <p>Other comments by users</p>
-          <ul className="other-comments">
+          <Comment comment={comment} full />
+          <h3>Related Article</h3>
+          <div>
+            <Article article={comment.article} full />
+            {/* {comment.article.title} by{' '} */}
+            {/* {new Date(comment.article.date).toLocaleDateString('en-US', {
+              hour: 'numeric',
+              minute: 'numeric',
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })} */}
+          </div>
+          <p>Related comments to the article</p>
+          <ul>
             {comment.article.comments.map(c => (
-              <li key={c.id}>{c.user}</li>
+              <Comment key={c.id} comment={c} />
             ))}
           </ul>
         </div>
       );
     } else {
-      return <div>Empty. write something </div>;
+      return <div>Empty. select something </div>;
     }
   }
 }

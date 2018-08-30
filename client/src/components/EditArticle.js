@@ -22,14 +22,12 @@ class EditArticle extends PureComponent {
   }
 
   editClick = e => {
-    // debugger;
     this.setState({
       isOpen: !this.state.isOpen
     });
   };
 
   editSubmit = e => {
-    debugger;
     this.props.editArticleMutation({
       variables: {
         id: this.props.id,
