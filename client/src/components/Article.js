@@ -23,7 +23,7 @@ const Article = ({ article, onClick, edit, full }) => {
           {new Date(article.date).toLocaleDateString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
-            weekday: 'long',
+            // weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'

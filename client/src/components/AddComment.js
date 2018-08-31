@@ -56,7 +56,7 @@ class AddComment extends Component {
   };
 
   showArticles() {
-    const { getArticlesQuery: data } = this.props;
+    const { data } = this.props;
     if (data.loading) {
       return <option disabled>Loading articles ..</option>;
     } else {
@@ -70,6 +70,6 @@ class AddComment extends Component {
 }
 
 export default compose(
-  graphql(getArticlesQuery, { name: 'getArticlesQuery' }),
+  graphql(getArticlesQuery),
   graphql(addCommentMutation, { name: 'addCommentMutation' })
 )(AddComment);

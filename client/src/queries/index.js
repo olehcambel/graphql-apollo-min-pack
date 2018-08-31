@@ -95,8 +95,8 @@ export const editArticleMutation = gql`
 `;
 
 export const getPreviewQuery = gql`
-  {
-    articles {
+  query($title: String, $offset: Int, $first: Int) {
+    articles(title: $title, offset: $offset, first: $first) {
       id
       title
       text

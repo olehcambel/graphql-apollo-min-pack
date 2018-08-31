@@ -52,8 +52,8 @@ const RootQuery = new GraphQLObjectType({
       args: { offset: { type: GraphQLInt }, first: { type: GraphQLInt } },
       resolve(parent, args) {
         return Comment.find({})
-          .skip(args.offset)
-          .limit(args.first);
+          .skip(args.offset || null)
+          .limit(args.first || null);
       }
     },
     comment: {
@@ -67,12 +67,19 @@ const RootQuery = new GraphQLObjectType({
 
     articles: {
       type: new GraphQLList(ArticleType),
-      args: { offset: { type: GraphQLInt }, first: { type: GraphQLInt } },
+      args: {
+        title: { type: GraphQLString },
+        offset: { type: GraphQLInt },
+        first: { type: GraphQLInt }
+      },
 
       resolve(parent, args) {
-        return Article.find({})
-          .skip(args.offset)
-          .limit(args.first);
+        debugger;
+        return Article.find(
+          args.title ? { title: new RegExp(args.title, 'i') } : {}
+        )
+          .skip(args.offset || null)
+          .limit(args.first || null);
       }
     },
     article: {

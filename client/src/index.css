@@ -8,7 +8,7 @@ body {
 
 .wrap {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 4fr;
   /* grid-template-rows: 200px 150px 50px; */
   grid-template-areas: 'sidebar content';
 }
@@ -22,4 +22,38 @@ body {
   grid-area: sidebar;
   /* height: 400px; */
   /* background-color: red; */
+}
+
+.articles {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.article-card {
+  padding: 20px;
+  width: 25%;
+}
+
+.article-card .img {
+  width: 200px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.controls button {
+  padding: 5px;
+}
+
+.search-controls {
+  padding: 10px 20px;
+  float: right;
+}
+
+.search-controls input,
+.search-controls button {
+  padding: 5px;
 }
