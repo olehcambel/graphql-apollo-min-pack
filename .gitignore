@@ -1,4 +1,5 @@
 package-lock.json
 /server/node_modules
 server/.env
+server-express/.env
 /node_modules
