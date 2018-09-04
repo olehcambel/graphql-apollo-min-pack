@@ -15,58 +15,6 @@ const sequelize = new Sequelize(
   }
 );
 
-// Example: remove in the next version
-const users = [
-  {
-    id: 1,
-    name: 'Oleh',
-    githubName: 'olehcambel',
-    bio: null,
-    company: 'undefined',
-    avatarUrl: 'https://avatars2.githubusercontent.com/u/36879518?v=4',
-    donatedAmount: 200,
-    donates: [2]
-  },
-  {
-    id: 2,
-    name: 'Dan Abramov',
-    githubName: 'gaearon',
-    bio:
-      'Working on @reactjs. Co-author of Redux and Create React App. Building tools for humans.',
-    company: '@facebook',
-    avatarUrl: 'https://avatars0.githubusercontent.com/u/810438?v=4',
-    donatedAmount: 500,
-    donates: [2]
-  }
-];
-
-const donates = [
-  {
-    id: 1,
-    title: 'Help rich people',
-    date: 1535953733922,
-    description: 'description for rich',
-    amountAim: 1000,
-    amount: 50,
-    completed: false,
-    creatorId: 1,
-    donators: []
-  },
-  {
-    id: 2,
-    title: 'Help poor people',
-    date: 1535953734922,
-    description: 'description for poor',
-    amountAim: 1000,
-    amount: 700,
-    completed: false,
-    creatorId: 1,
-    donators: [1, 2]
-  }
-];
-
-//   stars: { type: Sequelize.INTEGER, defaultValue: 0 },
-
 const Op = Sequelize.Op;
 
 const User = sequelize.define('user', {
@@ -76,7 +24,7 @@ const User = sequelize.define('user', {
   company: { type: Sequelize.STRING, defaultValue: '' },
   avatarUrl: { type: Sequelize.STRING, defaultValue: '' },
   donatedAmount: { type: Sequelize.INTEGER, defaultValue: 0 },
-  donates: { type: Sequelize.ARRAY(Sequelize.INTEGER) }
+  donates: { type: Sequelize.ARRAY(Sequelize.INTEGER), defaultValue: [] }
 });
 
 const Donate = sequelize.define('donate', {
@@ -88,7 +36,7 @@ const Donate = sequelize.define('donate', {
   completed: { type: Sequelize.BOOLEAN, defaultValue: false },
   // creatorId: { type: Sequelize.INTEGER },
   creator: { type: Sequelize.INTEGER },
-  donators: { type: Sequelize.ARRAY(Sequelize.INTEGER) }
+  donators: { type: Sequelize.ARRAY(Sequelize.INTEGER), defaultValue: [] }
 });
 
 // User.sync({ force: true }).then(async () => {
@@ -114,13 +62,44 @@ const Donate = sequelize.define('donate', {
 
 User.sync();
 Donate.sync();
-
+// [Op.gt]: 6,
 module.exports = {
   Query: {
-    users: () => User.findAll(),
+    users: (_, { limit, offset, orderBy, after }) => {
+      if (orderBy) {
+        // заменить на регулярку по первому _, а остальное пойдет в ордер
+
+        [type, order] = orderBy.split('_');
+      }
+      return User.findAll({
+        limit,
+        offset,
+        order: [[type ? type : 'createdAt', order ? order : 'ASC']],
+        where: {
+          id: {
+            [Op.gt]: after ? after : 0
+          }
+        }
+      });
+    },
     user: (_, { id }) => User.findById(id),
 
-    donates: () => Donate.findAll(),
+    donates: (_, { limit, offset, orderBy, after }) => {
+      if (orderBy) {
+        // заменить на регулярку по первому _, а остальное пойдет в ордер
+        [type, order] = orderBy.split('_');
+      }
+      return Donate.findAll({
+        limit,
+        offset,
+        order: [[type ? type : 'createdAt', order ? order : 'ASC']],
+        where: {
+          id: {
+            [Op.gt]: after ? after : 0
+          }
+        }
+      });
+    },
     donate: (_, { id }) => Donate.findById(id)
   },
 
@@ -133,8 +112,7 @@ module.exports = {
           date: Date.now(),
           description,
           amountAim,
-          creator: creatorId,
-          donators: []
+          creator: creatorId
         });
 
         return donate;
@@ -154,8 +132,7 @@ module.exports = {
           githubName,
           bio: gh.bio,
           company: gh.company,
-          avatarUrl: gh.avatar_url,
-          donates: []
+          avatarUrl: gh.avatar_url
         });
 
         return user;

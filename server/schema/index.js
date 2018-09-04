@@ -1,21 +1,14 @@
 const { gql } = require('apollo-server');
 const User = require('./user');
 const Donate = require('./donate');
-
-/**
- * Будет 2 схемы: Донат и Пользователи
- * Создается Донат по теме и необходимой суммой
- * дальше Пользователь вводит Гитхаб имя и сумму
- *
- * Выводится будут все Донаты
- * и Пользователи, с заДоначеной суммой и их Донаты
- */
+const OrderBy = require('./orderBy');
 
 const RootQuery = `
  type Query {
-  users: [User]
+  # users( limit: Int, offset: Int): [User]
+  users(limit: Int, offset: Int, orderBy: UsersOrderBy, after: Int): [User]
   user(id: Int!): User
-  donates: [Donate]
+  donates(limit: Int, offset: Int, orderBy: DonatesOrderBy, after: Int): [Donate]
   donate(id: Int!): Donate
 }
  `;
@@ -34,4 +27,5 @@ module.exports = gql`
   ${Mutation}
   ${User}
   ${Donate}
+  ${OrderBy}
 `;
