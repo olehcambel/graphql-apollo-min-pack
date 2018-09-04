@@ -10,10 +10,12 @@ const sequelize = new Sequelize(
     ssl: true,
     dialectOptions: {
       ssl: true
-    }
+    },
+    operatorsAliases: Sequelize.Op
   }
 );
 
+// Example: remove in the next version
 const users = [
   {
     id: 1,
@@ -63,87 +65,168 @@ const donates = [
   }
 ];
 
-// const Article = sequelize.define('frameworks', {
-//   title: { type: Sequelize.STRING },
-//   date: { type: Sequelize.STRING },
-//   text: { type: Sequelize.STRING }
-//   // comments: { type: Sequelize.ARRAY(Comment) }
-// });
-
-// const Comment = sequelize.define('comments', {
-//   username: { type: Sequelize.STRING },
-//   git: { type: Sequelize.STRING },
 //   stars: { type: Sequelize.INTEGER, defaultValue: 0 },
-//   description: { type: Sequelize.STRING, defaultValue: '' },
-//   avatar: { type: Sequelize.STRING, defaultValue: '' },
-//   date: { type: Sequelize.STRING },
-//   text: { type: Sequelize.STRING },
-//   article: { type: Sequelize.STRING }
+
+const Op = Sequelize.Op;
+
+const User = sequelize.define('user', {
+  name: { type: Sequelize.STRING, defaultValue: '' },
+  githubName: { type: Sequelize.STRING },
+  bio: { type: Sequelize.STRING, defaultValue: '' },
+  company: { type: Sequelize.STRING, defaultValue: '' },
+  avatarUrl: { type: Sequelize.STRING, defaultValue: '' },
+  donatedAmount: { type: Sequelize.INTEGER, defaultValue: 0 },
+  donates: { type: Sequelize.ARRAY(Sequelize.INTEGER) }
+});
+
+const Donate = sequelize.define('donate', {
+  title: { type: Sequelize.STRING },
+  date: { type: Sequelize.FLOAT },
+  description: { type: Sequelize.STRING },
+  amountAim: { type: Sequelize.INTEGER, defaultValue: 0 },
+  amount: { type: Sequelize.INTEGER, defaultValue: 0 },
+  completed: { type: Sequelize.BOOLEAN, defaultValue: false },
+  // creatorId: { type: Sequelize.INTEGER },
+  creator: { type: Sequelize.INTEGER },
+  donators: { type: Sequelize.ARRAY(Sequelize.INTEGER) }
+});
+
+// User.sync({ force: true }).then(async () => {
+//   await User.create({
+//     name: 'test',
+//     githubName: 'githubName',
+//     bio: 'gh.bio',
+//     company: 'gh.company',
+//     avatarUrl: 'gh.avatar_url',
+//     donates: []
+//   });
+// });
+// Donate.sync({ force: true }).then(async () => {
+//   await Donate.create({
+//     title: 'title',
+//     date: Date.now(),
+//     description: 'description',
+//     amountAim: 0,
+//     creator: 1,
+//     donators: []
+//   });
 // });
 
-// Framework.sync({ force: true });
-// Article.sync();
-// Comment.sync();
+User.sync();
+Donate.sync();
 
 module.exports = {
   Query: {
-    users: () => users,
-    user: (_, { id }) => users.find(user => user.id == id),
+    users: () => User.findAll(),
+    user: (_, { id }) => User.findById(id),
 
-    donates: () => donates,
-    donate: (_, { id }) => donates.find(donate => donate.id == id)
-
-    //   articles: () => Article.findAll(),
-    //   article: (_, params) => {
-    //     const id = params.id;
-    //     return articles.find(a => a.id == id);
-    //   },
-    //   comments: () => Comment.findAll(),
-    //   comment: (_, params) => {
-    //     const id = params.id;
-    //     return comments.find(c => c.id == id);
-    //   }
+    donates: () => Donate.findAll(),
+    donate: (_, { id }) => Donate.findById(id)
   },
 
   Mutation: {
-    // ДОДЕЛАТЬ МУТАЦИЮ
-    donateAmount: (_, { donateId, donatorId, amount }) => {
-      let donate = donates.find(donate => donate.id == donateId);
-      let user = users.find(user => user.id == donatorId);
+    // ТОЛЬКО USER МОЖЕТ СОЗДАВАТЬ DONATE
+    addDonate: async (_, { title, description, amountAim, creatorId }) => {
+      try {
+        const donate = await Donate.create({
+          title,
+          date: Date.now(),
+          description,
+          amountAim,
+          creator: creatorId,
+          donators: []
+        });
 
-      if (!donate || !user) {
-        throw new Error(`there is no id as ${donateId}`);
+        return donate;
+      } catch (e) {
+        throw new Error(e);
       }
+    },
 
-      if (
-        !donate.donators.length ||
-        !donate.donators.find(id => id == user.id)
-      ) {
-        // donate = { ...donate, donators: [...donate.donators, user.id] };
-        donate.donators = [...donate.donators, user.id];
+    addUser: async (_, { githubName }) => {
+      try {
+        const { data: gh } = await axios(
+          `https://api.github.com/users/${githubName}`
+        );
+
+        const user = await User.create({
+          name: gh.name,
+          githubName,
+          bio: gh.bio,
+          company: gh.company,
+          avatarUrl: gh.avatar_url,
+          donates: []
+        });
+
+        return user;
+      } catch (e) {
+        throw new Error(e);
       }
+    },
 
-      if (!user.donates.length || !user.donates.find(id => id == donate.id)) {
-        // user = { ...user, donates: [...user.donates, donate.id] };
-        user.donates = [...user.donates, donate.id];
+    donateAmount: async (_, { donateId, donatorId, amount }) => {
+      try {
+        let donate = await Donate.findById(donateId);
+        let user = await User.findById(donatorId);
+
+        if (!donate || !user) {
+          throw new Error(`there is no id as ${donateId}`);
+        }
+
+        if (
+          !donate.donators.length ||
+          !donate.donators.find(id => id == user.id)
+        ) {
+          await donate.update({
+            donators: [...donate.donators, user.id]
+          });
+        }
+
+        if (!user.donates.length || !user.donates.find(id => id == donate.id)) {
+          await user.update({
+            donates: [...user.donates, donate.id]
+          });
+        }
+
+        await donate.update({
+          // donators: donate.id
+          amount: (donate.amount += amount)
+        });
+        await user.update({
+          donatedAmount: (user.donatedAmount += amount)
+        });
+
+        // why return only DONATE??
+        // если вернет только для одной схемы, тогда в ней и буду менять данные
+        // возможно вложенность мутирует и самого юзера
+        return donate;
+      } catch (e) {
+        throw new Error(e);
       }
-
-      donate.amount += amount;
-      user.donatedAmount += amount;
-      // why return only DONATE??
-      return donate;
     }
   },
 
   User: {
     donates: donator =>
-      donator.donates.map(id => donates.find(donate => donate.id == id))
+      Donate.findAll({
+        where: {
+          id: {
+            [Op.or]: donator.donates
+          }
+        }
+      })
   },
 
   Donate: {
-    creator: donate => users.find(user => user.id == donate.creatorId),
+    creator: donate => User.findById(donate.creator),
     donators: donate =>
-      donate.donators.map(id => users.find(user => user.id == id))
+      User.findAll({
+        where: {
+          id: {
+            [Op.or]: donate.donators
+          }
+        }
+      })
   }
 };
 

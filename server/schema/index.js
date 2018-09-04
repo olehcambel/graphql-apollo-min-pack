@@ -23,6 +23,9 @@ const RootQuery = `
 const Mutation = `
  type Mutation {
   donateAmount(donateId: Int!, donatorId: Int!, amount: Int!): Donate
+  addDonate(title: String!, description: String, amountAim: Int!, creatorId: Int!): Donate
+
+  addUser(githubName: String!): User
 }
  `;
 
