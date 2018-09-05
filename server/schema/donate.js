@@ -1,6 +1,6 @@
 module.exports = `
 type Donate {
-  id: Int!
+  id: ID!
   title: String
   date: Float
   description: String

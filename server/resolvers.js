@@ -1,6 +1,7 @@
 const axios = require('axios');
 require('dotenv').config({ path: './.env' });
 const Sequelize = require('sequelize');
+const filtrated = require('./helpers/filtrated');
 
 const sequelize = new Sequelize(
   `postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${
@@ -62,40 +63,47 @@ const Donate = sequelize.define('donate', {
 
 User.sync();
 Donate.sync();
-// [Op.gt]: 6,
+
 module.exports = {
   Query: {
-    users: (_, { limit, offset, orderBy, after }) => {
-      if (orderBy) {
-        // заменить на регулярку по первому _, а остальное пойдет в ордер
+    users: async (_, { limit, offset, orderBy, filter }) => {
+      const {
+        order,
+        orderType,
+        filterOp,
+        filterType,
+        filterCriteria
+      } = filtrated(orderBy, filter);
 
-        [type, order] = orderBy.split('_');
-      }
-      return User.findAll({
+      return await User.findAll({
         limit,
         offset,
-        order: [[type ? type : 'createdAt', order ? order : 'ASC']],
+        order: [[orderType, order]],
         where: {
-          id: {
-            [Op.gt]: after ? after : 0
+          [filterType]: {
+            [Op[filterOp]]: filterCriteria
           }
         }
       });
     },
     user: (_, { id }) => User.findById(id),
 
-    donates: (_, { limit, offset, orderBy, after }) => {
-      if (orderBy) {
-        // заменить на регулярку по первому _, а остальное пойдет в ордер
-        [type, order] = orderBy.split('_');
-      }
+    donates: (_, { limit, offset, orderBy, filter }) => {
+      const {
+        order,
+        orderType,
+        filterOp,
+        filterType,
+        filterCriteria
+      } = filtrated(orderBy, filter);
+
       return Donate.findAll({
         limit,
         offset,
-        order: [[type ? type : 'createdAt', order ? order : 'ASC']],
+        order: [[orderType, order]],
         where: {
-          id: {
-            [Op.gt]: after ? after : 0
+          [filterType]: {
+            [Op[filterOp]]: filterCriteria
           }
         }
       });
@@ -104,7 +112,6 @@ module.exports = {
   },
 
   Mutation: {
-    // ТОЛЬКО USER МОЖЕТ СОЗДАВАТЬ DONATE
     addDonate: async (_, { title, description, amountAim, creatorId }) => {
       try {
         const donate = await Donate.create({
@@ -174,8 +181,6 @@ module.exports = {
         });
 
         // why return only DONATE??
-        // если вернет только для одной схемы, тогда в ней и буду менять данные
-        // возможно вложенность мутирует и самого юзера
         return donate;
       } catch (e) {
         throw new Error(e);
@@ -207,7 +212,7 @@ module.exports = {
   }
 };
 
-/** Я не понимаю как мне делать поиск donates[Donate] + donators[User] 
+/** Example
  * user #1 donated 50 to donate #2
  * user #1 donated 150 to donate #2
  * user #2 donated 150 to donate #2

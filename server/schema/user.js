@@ -1,6 +1,6 @@
 module.exports = `
 type User {
-  id: Int!
+  id: ID!
   name: String
   githubName: String
   bio: String

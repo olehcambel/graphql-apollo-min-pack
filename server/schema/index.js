@@ -2,21 +2,21 @@ const { gql } = require('apollo-server');
 const User = require('./user');
 const Donate = require('./donate');
 const OrderBy = require('./orderBy');
+const Filter = require('./filter');
 
 const RootQuery = `
  type Query {
-  # users( limit: Int, offset: Int): [User]
-  users(limit: Int, offset: Int, orderBy: UsersOrderBy, after: Int): [User]
-  user(id: Int!): User
-  donates(limit: Int, offset: Int, orderBy: DonatesOrderBy, after: Int): [Donate]
-  donate(id: Int!): Donate
+  users(limit: Int, offset: Int, orderBy: UsersOrderBy, filter: UsersFilter): [User]
+  user(id: ID!): User
+  donates(limit: Int, offset: Int, orderBy: DonatesOrderBy, filter: DonatesFilter): [Donate]
+  donate(id: ID!): Donate
 }
  `;
 
 const Mutation = `
  type Mutation {
-  donateAmount(donateId: Int!, donatorId: Int!, amount: Int!): Donate
-  addDonate(title: String!, description: String, amountAim: Int!, creatorId: Int!): Donate
+  donateAmount(donateId: ID!, donatorId: ID!, amount: Int!): Donate
+  addDonate(title: String!, description: String, amountAim: Int!, creatorId: ID!): Donate
 
   addUser(githubName: String!): User
 }
@@ -28,4 +28,5 @@ module.exports = gql`
   ${User}
   ${Donate}
   ${OrderBy}
+  ${Filter}
 `;
