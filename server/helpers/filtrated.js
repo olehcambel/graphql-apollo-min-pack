@@ -1,20 +1,33 @@
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
 module.exports = (orderBy, filter) => {
   let [orderType, order] = ['createdAt', 'ASC'];
-  let [filterType, filterOp, filterCriteria] = ['id', 'gt', 0];
 
   if (orderBy) {
     [orderType, order] = orderBy.split('_');
     // [orderType, order] = orderBy.replace(/_/, '&').split('&')
   }
+  let filterStr = {};
   if (filter) {
-    [_filter, filterCriteria] = Object.entries(filter)[0];
-    [filterType, filterOp, pos] = _filter.split('_');
+    for (let prop in filter) {
+      let [type, op, pos] = prop.split('_');
 
-    if (filterOp == 'iLike') {
-      filterCriteria =
-        pos == 'starts' ? `${filterCriteria}%` : `%${filterCriteria}%`;
+      if (op == 'iLike') {
+        filter[prop] =
+          pos == 'starts' ? `${filter[prop]}%` : `%${filter[prop]}%`;
+      }
+
+      filterStr = {
+        ...filterStr,
+        [type]: { [Op[op]]: filter[prop] }
+      };
     }
+  } else {
+    filterStr = {
+      ['id']: { [Op.gt]: 0 }
+    };
   }
 
-  return { orderType, order, filterType, filterOp, filterCriteria };
+  return { orderType, order, filterStr };
 };

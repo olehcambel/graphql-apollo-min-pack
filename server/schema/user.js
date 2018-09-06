@@ -6,7 +6,7 @@ type User {
   bio: String
   company: String
   avatarUrl: String
-  donatedAmount: Int
+  amountDonated: Int
   donates: [Donate]
 }
 `;

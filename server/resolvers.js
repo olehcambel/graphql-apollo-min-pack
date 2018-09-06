@@ -2,7 +2,8 @@ const axios = require('axios');
 require('dotenv').config({ path: './.env' });
 const Sequelize = require('sequelize');
 const filtrated = require('./helpers/filtrated');
-
+const userDef = require('./db/userDef');
+const donateDef = require('./db/donateDef');
 const sequelize = new Sequelize(
   `postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${
     process.env.DB_HOST
@@ -23,16 +24,25 @@ const User = sequelize.define('user', {
   githubName: { type: Sequelize.STRING },
   bio: { type: Sequelize.STRING, defaultValue: '' },
   company: { type: Sequelize.STRING, defaultValue: '' },
-  avatarUrl: { type: Sequelize.STRING, defaultValue: '' },
-  donatedAmount: { type: Sequelize.INTEGER, defaultValue: 0 },
+  avatarUrl: {
+    type: Sequelize.STRING,
+    defaultValue:
+      'https://yt3.ggpht.com/a-/ACSszfHXWBb_x1MUBtpuEa9xBBmFVuSRdvi02bquEQ=s900-mo-c-c0xffffffff-rj-k-no'
+  },
+  amountDonated: { type: Sequelize.INTEGER, defaultValue: 0 },
   donates: { type: Sequelize.ARRAY(Sequelize.INTEGER), defaultValue: [] }
 });
 
 const Donate = sequelize.define('donate', {
   title: { type: Sequelize.STRING },
-  date: { type: Sequelize.FLOAT },
-  description: { type: Sequelize.STRING },
-  amountAim: { type: Sequelize.INTEGER, defaultValue: 0 },
+  date: { type: Sequelize.FLOAT, defaultValue: Date.now() },
+  coverUrl: {
+    type: Sequelize.STRING,
+    defaultValue:
+      'https://marchforlife.ca/wp-content/uploads/2017/02/donate-1.jpg'
+  },
+  description: { type: Sequelize.STRING(1000), defaultValue: '' },
+  amountGoal: { type: Sequelize.INTEGER },
   amount: { type: Sequelize.INTEGER, defaultValue: 0 },
   completed: { type: Sequelize.BOOLEAN, defaultValue: false },
   // creatorId: { type: Sequelize.INTEGER },
@@ -40,25 +50,14 @@ const Donate = sequelize.define('donate', {
   donators: { type: Sequelize.ARRAY(Sequelize.INTEGER), defaultValue: [] }
 });
 
-// User.sync({ force: true }).then(async () => {
-//   await User.create({
-//     name: 'test',
-//     githubName: 'githubName',
-//     bio: 'gh.bio',
-//     company: 'gh.company',
-//     avatarUrl: 'gh.avatar_url',
-//     donates: []
-//   });
-// });
-// Donate.sync({ force: true }).then(async () => {
-//   await Donate.create({
-//     title: 'title',
-//     date: Date.now(),
-//     description: 'description',
-//     amountAim: 0,
-//     creator: 1,
-//     donators: []
-//   });
+// sequelize.sync({force: true}).then(async () => {
+
+// })
+
+// sequelize.sync({ force: true }).then(async () => {
+//   const userRes = await userDef();
+//   userRes.forEach(u => User.create(u));
+//   donateDef.forEach(d => Donate.create(d));
 // });
 
 User.sync();
@@ -89,22 +88,13 @@ module.exports = {
     user: (_, { id }) => User.findById(id),
 
     donates: (_, { limit, offset, orderBy, filter }) => {
-      const {
-        order,
-        orderType,
-        filterOp,
-        filterType,
-        filterCriteria
-      } = filtrated(orderBy, filter);
-
+      const { order, orderType, filterStr } = filtrated(orderBy, filter);
       return Donate.findAll({
         limit,
         offset,
         order: [[orderType, order]],
         where: {
-          [filterType]: {
-            [Op[filterOp]]: filterCriteria
-          }
+          ...filterStr
         }
       });
     },
@@ -112,13 +102,17 @@ module.exports = {
   },
 
   Mutation: {
-    addDonate: async (_, { title, description, amountAim, creatorId }) => {
+    addDonate: async (
+      _,
+      { title, description, coverUrl, amountGoal, creatorId }
+    ) => {
       try {
         const donate = await Donate.create({
           title,
           date: Date.now(),
           description,
-          amountAim,
+          coverUrl,
+          amountGoal,
           creator: creatorId
         });
 
@@ -157,27 +151,52 @@ module.exports = {
           throw new Error(`there is no id as ${donateId}`);
         }
 
-        if (
-          !donate.donators.length ||
-          !donate.donators.find(id => id == user.id)
-        ) {
-          await donate.update({
-            donators: [...donate.donators, user.id]
-          });
-        }
+        // havent tested yet !!1
+        // seems to be better to update everything at once
 
-        if (!user.donates.length || !user.donates.find(id => id == donate.id)) {
-          await user.update({
+        (donate.amountGoal <= donate.amount &&
+          !donate.completed &&
+          (await donate.update({
+            completed: true
+          })))(
+          // if(donate.amountGoal <= donate.amount && !donate.completed){
+          //   await donate.update({
+          //     completed: true
+          //   });
+          // }
+
+          (!donate.donators.length ||
+            !donate.donators.find(id => id == user.id)) &&
+            (await donate.update({
+              donators: [...donate.donators, user.id]
+            }))
+        );
+
+        // if (
+        //   !donate.donators.length ||
+        //   !donate.donators.find(id => id == user.id)
+        // ) {
+        //   await donate.update({
+        //     donators: [...donate.donators, user.id]
+        //   });
+        // }
+
+        (!user.donates.length || !user.donates.find(id => id == donate.id)) &&
+          (await user.update({
             donates: [...user.donates, donate.id]
-          });
-        }
+          }));
+        // if (!user.donates.length || !user.donates.find(id => id == donate.id)) {
+        //   await user.update({
+        //     donates: [...user.donates, donate.id]
+        //   });
+        // }
 
         await donate.update({
           // donators: donate.id
           amount: (donate.amount += amount)
         });
         await user.update({
-          donatedAmount: (user.donatedAmount += amount)
+          amountDonated: (user.amountDonated += amount)
         });
 
         // why return only DONATE??
@@ -229,17 +248,17 @@ module.exports = {
 Donate [
   {
     id: 2
-    amountAim: 1000
+    amountGoal: 1000
     amount: 700
     donators: ['1', '2']
     donators: [
       {
         id: 1
-        donatedAmount: 200 = 150 + 50
+        amountDonated: 200 = 150 + 50
       },
       {
         id: 2
-        donatedAmount: 500
+        amountDonated: 500
       },
       
     ]
@@ -249,24 +268,24 @@ Donate [
 User [
   {
     id: 1
-    donatedAmount: 200 = 150 + 50
+    amountDonated: 200 = 150 + 50
     donates: ['2']
     donates: [
       {
         id: 2
-        amountAim: 1000
+        amountGoal: 1000
         amount: 700
       }
     ]
   },
   {
     id: 2
-    donatedAmount: 500
+    amountDonated: 500
     donates: ['2']
     donates: [
       {
         id: 2
-        amountAim: 1000
+        amountGoal: 1000
         amount: 700
       }
     ]

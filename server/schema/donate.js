@@ -4,7 +4,8 @@ type Donate {
   title: String
   date: Float
   description: String
-  amountAim: Int
+  coverUrl: String
+  amountGoal: Int
   amount: Int
   completed: Boolean
   donators: [User]
