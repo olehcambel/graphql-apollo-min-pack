@@ -50,10 +50,6 @@ const Donate = sequelize.define('donate', {
   donators: { type: Sequelize.ARRAY(Sequelize.INTEGER), defaultValue: [] }
 });
 
-// sequelize.sync({force: true}).then(async () => {
-
-// })
-
 // sequelize.sync({ force: true }).then(async () => {
 //   const userRes = await userDef();
 //   userRes.forEach(u => User.create(u));
@@ -66,22 +62,14 @@ Donate.sync();
 module.exports = {
   Query: {
     users: async (_, { limit, offset, orderBy, filter }) => {
-      const {
-        order,
-        orderType,
-        filterOp,
-        filterType,
-        filterCriteria
-      } = filtrated(orderBy, filter);
+      const { order, orderType, filterStr } = filtrated(orderBy, filter);
 
       return await User.findAll({
         limit,
         offset,
         order: [[orderType, order]],
         where: {
-          [filterType]: {
-            [Op[filterOp]]: filterCriteria
-          }
+          ...filterStr
         }
       });
     },
@@ -151,45 +139,23 @@ module.exports = {
           throw new Error(`there is no id as ${donateId}`);
         }
 
-        // havent tested yet !!1
-        // seems to be better to update everything at once
-
-        (donate.amountGoal <= donate.amount &&
+        // try to make update only once
+        donate.amountGoal <= donate.amount &&
           !donate.completed &&
           (await donate.update({
             completed: true
-          })))(
-          // if(donate.amountGoal <= donate.amount && !donate.completed){
-          //   await donate.update({
-          //     completed: true
-          //   });
-          // }
+          }));
 
-          (!donate.donators.length ||
-            !donate.donators.find(id => id == user.id)) &&
-            (await donate.update({
-              donators: [...donate.donators, user.id]
-            }))
-        );
-
-        // if (
-        //   !donate.donators.length ||
-        //   !donate.donators.find(id => id == user.id)
-        // ) {
-        //   await donate.update({
-        //     donators: [...donate.donators, user.id]
-        //   });
-        // }
+        (!donate.donators.length ||
+          !donate.donators.find(id => id == user.id)) &&
+          (await donate.update({
+            donators: [...donate.donators, user.id]
+          }));
 
         (!user.donates.length || !user.donates.find(id => id == donate.id)) &&
           (await user.update({
             donates: [...user.donates, donate.id]
           }));
-        // if (!user.donates.length || !user.donates.find(id => id == donate.id)) {
-        //   await user.update({
-        //     donates: [...user.donates, donate.id]
-        //   });
-        // }
 
         await donate.update({
           // donators: donate.id
@@ -208,14 +174,17 @@ module.exports = {
   },
 
   User: {
-    donates: donator =>
-      Donate.findAll({
+    donates: donator => {
+      debugger;
+      // я ожидаю что будет выдавать всех юзеров с таким айди, а если нету, то пустой обьект
+      return Donate.findAll({
         where: {
           id: {
-            [Op.or]: donator.donates
+            [Op.in]: donator.donates
           }
         }
-      })
+      });
+    }
   },
 
   Donate: {
@@ -224,7 +193,7 @@ module.exports = {
       User.findAll({
         where: {
           id: {
-            [Op.or]: donate.donators
+            [Op.in]: donate.donators
           }
         }
       })
