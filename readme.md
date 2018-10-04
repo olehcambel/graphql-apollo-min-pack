@@ -12,13 +12,13 @@
 ## Start
 
 ```
-concurrently: npm run start
 /server: npm run dev
-/client: npm run start
+or npm run server
 ```
 
 ## Backend
 
+- online demo [CLICK](https://apollo-server-udgyigvibl.now.sh)
 - open http://localhost:4000
 - use SCHEMA for Queries, Mutations
 
